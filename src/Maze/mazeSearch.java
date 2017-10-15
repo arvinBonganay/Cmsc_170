@@ -49,7 +49,7 @@ public class mazeSearch {
     }
     
     public static void main(String[] args) {
-        Maze x = read("src/Maze/others/bigMaze.lay.txt");
+        Maze x = read("others/bigMaze.lay.txt");
         solveMaze(x, "straightLine");
         x.display();
     }
