@@ -104,9 +104,6 @@ public class mazeSearch {
                         x.f = (x.g + x.h);
                         openList.add(x);
                     }
-                    
-                    
-                    
                 }
             }
         }
@@ -127,7 +124,6 @@ public class mazeSearch {
             current = current.parent;
         }
     }
-    
     
     public static List<Square> neighbor(Square sq, Maze m){
         int row = sq.row;
@@ -175,7 +171,6 @@ public class mazeSearch {
             return 0;
         }
     }
-    
     
     public static int manhattanD(int x1, int x2, int y1, int y2){
         return Math.abs(x1 - x2) + Math.abs(y1 - y2);
