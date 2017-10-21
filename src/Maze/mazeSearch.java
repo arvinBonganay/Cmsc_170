@@ -1,80 +1,17 @@
 package Maze;
-// testing
 import java.io.*;
 import java.util.*;
 
-public class mazeSearch {
-    public static class Square{
-        char val;
-        int f, g, h, row, col;
-        Square parent;
-        Square(char val, int row, int col){
-            this.val = val;
-            this.row = row;
-            this.col = col;
-        }
-    }
+public class MazeSearch {
     
-    public static class Maze{
-        List<List <Square>> maze;
-        int colSize;
-        int rowSize;    
-        Square start;
-        Square goal;
-        Maze(List<List <Square>> maze){
-            this.maze = maze;
-            rowSize = maze.size();
-            colSize = maze.get(0).size();
-            for (List<Square> x: maze){
-                for (int i = 0; i < x.size(); i++){
-                    if (x.get(i).val == 'P'){
-                        start = x.get(i);
-                        start.parent = null;
-                    } else if (x.get(i).val == '.')
-                        goal = x.get(i);
-                }
-            }
-        }
-        void display(){
-            for (List<Square> x: maze){
-                for (int i = 0; i < x.size(); i++){
-                    System.out.print(x.get(i).val + " ");
-                }
-                System.out.println();
-            }
-        }
-        Square get(int row, int col){
-            return maze.get(row).get(col);
-        }
-    }
     
     public static void main(String[] args) {
-        Maze x = read("others/bigMaze.lay.txt");
-        solveMaze(x, "straightLine");
+        String heuristic = "manhattan";
+        Maze x = new Maze("others/openMaze.lay.txt");
+        solve(x, heuristic);
         x.display();
     }
     
-    public static Maze read(String filename){
-        List<List <Square>> row = new ArrayList<>();
-        try (FileInputStream in = new FileInputStream(filename);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));) {
-            String line;
-            int r = 0;
-            while ((line = reader.readLine()) != null){
-                List<Square> data = new ArrayList();
-                for (int i = 0; i < line.length(); i++){
-                    data.add(new Square(line.charAt(i), r, i));
-                }
-                row.add(data);
-                r++;
-            }
-            in.close();
-            reader.close();
-        } catch (Exception e){
-            System.out.print("File does not exist");
-        }
-        return new Maze(row);
-    }
     public static void solveMaze(Maze maze, String hueristics){
         List<Square> closedList = new ArrayList<>();
         List<Square> openList = new ArrayList<>();
@@ -84,12 +21,12 @@ public class mazeSearch {
         current.f = current.g + current.h;
         openList.add(current);
         while(!closedList.contains(maze.goal) && !openList.isEmpty()){
-            current = minCost(openList); // can also use the list sort for lesser time complexity
+            current = minCost(openList); 
             closedList.add(current);
             openList.remove(current);
-            List<Square> neighbor = neighbor(current, maze);
+            List<Square> neighbor = maze.neighbor(current);
             for (Square x: neighbor){
-                if (x.val != '%' && !closedList.contains(x)){
+                if (!x.val.equals("%") && !closedList.contains(x)){
                     if (openList.contains(x)){
                         int tempG = current.g + 1;
                         if (x.g > tempG){
@@ -117,33 +54,23 @@ public class mazeSearch {
         }
     }
     
-    public static void trace(Square goal){
-        Square current = goal;
-        while(current.parent != null){
-            current.val = '.';
-            current = current.parent;
+    public static void solve(Maze m, String heuristic){
+        int i = 0;
+        while(m.goal != null){
+            System.out.println(i);
+            solveMaze(m, heuristic);
+            m.start = m.goal;
+            m.start.parent = null;
+            m.nextGoal();
         }
     }
     
-    public static List<Square> neighbor(Square sq, Maze m){
-        int row = sq.row;
-        int col = sq.col;
-        int mRow = m.rowSize;
-        int mCol = m.colSize;
-        List<Square> l = new ArrayList<>();
-        if (col - 1 >= 0){
-            l.add(m.get(row, col - 1));
+    public static void trace(Square goal){
+        Square current = goal;
+        while(current.parent != null){
+            current.val = ".";
+            current = current.parent;
         }
-        if (row + 1 <mRow){
-            l.add(m.get(row + 1, col));
-        }
-        if (col + 1 < mCol){
-            l.add(m.get(row, col + 1));
-        }
-        if (row - 1 >= 0){
-            l.add(m.get(row - 1, col));
-        }
-        return l;
     }
     
     public static Square minCost(List<Square> l){
@@ -167,7 +94,7 @@ public class mazeSearch {
         } else if (hueristics.equals("straightLine")){ 
             return straightLineD(x1, y1, x2, y2);
         } else {
-            System.err.println("Incorrect heuristics");
+            System.err.println("Incorrect heuristic");
             return 0;
         }
     }
