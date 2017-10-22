@@ -3,21 +3,22 @@ import java.io.*;
 import java.util.*;
 
 public class MazeSolver {
-    // edit later
-    
+
     public static void main(String[] args) {
-        String heuristic = "manhattan";
-        Maze x = new Maze("others/openMaze.lay.txt");
+        String a = "straightLine";
+        String b = "manhattan";
+        String heuristic = a;
+        Maze x = new Maze("others/mediumMaze.lay.txt");
         solve(x, heuristic);
         x.display();
     }
     
-    public static void solveMaze(Maze maze, String hueristics){
+    public static int solveMaze(Maze maze, String hueristics){
         List<Square> closedList = new ArrayList<>();
         List<Square> openList = new ArrayList<>();
         Square current = maze.start;
         current.g = 0;
-        current.h = hCost(hueristics, maze, current);
+        current.h = maze.hCost(hueristics, current);
         current.f = current.g + current.h;
         openList.add(current);
         while(!closedList.contains(maze.goal) && !openList.isEmpty()){
@@ -37,7 +38,7 @@ public class MazeSolver {
                     } else {
                         x.g = current.g + 1;
                         x.parent = current;
-                        x.h = hCost(hueristics, maze, x);
+                        x.h = maze.hCost(hueristics, x);
                         x.f = (x.g + x.h);
                         openList.add(x);
                     }
@@ -45,29 +46,33 @@ public class MazeSolver {
             }
         }
         if (closedList.contains(maze.goal)){
-            System.out.println("Successfuly found the target square");
-            System.out.println(closedList.size());
-            trace(maze.goal);
+            System.out.println("Successfuly found the target square at " + maze.goal.row + "," + maze.goal.col);
+            trace(maze, maze.goal);
+            return closedList.size();
         } else {
             System.out.println("Failed to find the target square at " + maze.goal.row + "," + maze.goal.col);
+            return 0;
         }
     }
     
     public static void solve(Maze m, String heuristic){
-        int i = 0;
+        int nodesExpanded = 0;
+        m.nextGoal(heuristic);
         while(m.goal != null){
-            System.out.println(i);
-            solveMaze(m, heuristic);
-            m.start = m.goal;
-            m.start.parent = null;
-            m.nextGoal();
+            nodesExpanded += solveMaze(m, heuristic);
+            m.nextGoal(heuristic);
         }
+        System.out.println(nodesExpanded + " nodes expanded");
     }
     
-    public static void trace(Square goal){
-        Square current = goal;
+    public static void trace(Maze m, Square goal){
+        Square current = goal.parent;
         while(current.parent != null){
-            current.val = "*";
+            if (current.val.equals(".")) {
+                m.removeGoal(current);
+                System.out.println("here!!!");
+            }
+            current.val = ".";
             current = current.parent;
         }
     }
@@ -80,29 +85,6 @@ public class MazeSolver {
             }
         }
         return min;
-    }
+    }   
     
-    public static int hCost(String hueristics, Maze m, Square sq){
-        int x1 = sq.row;
-        int y1 = sq.col;
-        int x2 = m.goal.row;
-        int y2 = m.goal.col;
-        
-        if (hueristics.equals("manhattan")){
-            return manhattanD(x1, y1, x2, y2);
-        } else if (hueristics.equals("straightLine")){ 
-            return straightLineD(x1, y1, x2, y2);
-        } else {
-            System.err.println("Incorrect heuristic");
-            return 0;
-        }
-    }
-    
-    public static int manhattanD(int x1, int x2, int y1, int y2){
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    }
-    
-    public static int straightLineD(int x1, int x2, int y1, int y2){
-        return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
-    }
 }

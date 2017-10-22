@@ -14,8 +14,7 @@ public class Maze {
     Square start;
     Square goal;
     List<Square> goals;
-    int goalCounter;
-
+    
     Maze(String filename){
         List<List <Square>> row = new ArrayList<>();
         goals = new ArrayList<>();
@@ -31,6 +30,8 @@ public class Maze {
                     data.add(s);
                     if (val.equals("P")){
                         start = s;
+                        goal = start;
+                        goals.add(start);
                     } else if (val.equals(".")) {
                         goals.add(s);
                     }
@@ -40,21 +41,20 @@ public class Maze {
             }
             in.close();
             reader.close();
+            maze = row;
+            rowSize = maze.size();
+            colSize = maze.get(0).size();
         } catch (IOException e){
-            System.out.print("File does not exist");
+            System.err.print("File does not exist");
         } catch (Exception e){
             e.printStackTrace();
         }
-        maze = row;
-        rowSize = maze.size();
-        colSize = maze.get(0).size();
-        goal = goals.get(0);
     }
     
     void display(){
         for (List<Square> x: maze){
             for (int i = 0; i < x.size(); i++){
-                System.out.print(x.get(i).val + " ");
+                System.out.print(x.get(i).val);
             }
             System.out.println();
         }
@@ -85,12 +85,50 @@ public class Maze {
         return l;
     }
     
-    void nextGoal(){
-        goalCounter++;
-        if (goalCounter < goals.size()){
-            goal = goals.get(goalCounter);
+    void nextGoal(String heuristic){
+        start = goal;
+        removeGoal(start);
+        start.parent = null;
+        Square g = null;
+        if (!goals.isEmpty()){
+            g = goals.get(0);
+            goal = g;
+            int min = hCost(heuristic, start);
+            for(Square s: goals){
+                goal = s;
+                int cost = hCost(heuristic, start);
+                if (cost < min){
+                    min = cost;
+                    g = s;
+                }
+            }
+        }
+        goal = g;
+    }
+    
+    void removeGoal(Square s){
+        goals.remove(s);
+    }
+    
+    int manhattanD(int x1,int y1){
+        return Math.abs(x1 - goal.row) + Math.abs(y1 - goal.col);
+    }
+    
+    int straightLineD(int x1, int y1){
+        return Math.max(Math.abs(x1 - goal.row), Math.abs(y1 - goal.col));
+    }
+    
+    int hCost(String hueristics,Square sq){
+        int x1 = sq.row;
+        int y1 = sq.col;
+        
+        if (hueristics.equals("manhattan")){
+            return manhattanD(x1, y1);
+        } else if (hueristics.equals("straightLine")){ 
+            return straightLineD(x1, y1);
         } else {
-            goal = null;
+            System.err.println("Incorrect heuristic");
+            return 0;
         }
     }
 }
