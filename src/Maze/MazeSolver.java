@@ -4,11 +4,14 @@ import java.util.*;
 
 public class MazeSolver {
     static int frontier = 0;
+    
     public static void main(String[] args) {
+        String fileName = "others/bigSearch.lay.txt";
+        int space = 2;
         String a = "straightLine";
         String b = "manhattan";
         String heuristic = b;
-        Maze x = new Maze("others/smallMaze.lay.txt");
+        Maze x = new Maze(fileName, space);
         System.out.println("The Maze:");
         x.display();
         solve(x, heuristic);
@@ -70,9 +73,9 @@ public class MazeSolver {
         m.display();
         System.out.println("");
         System.out.println("Heuristics: " + heuristic);
-        System.out.println(nodesExpanded + " nodes expanded");
-        System.out.println(pathCost + " path cost");
-        System.out.println(frontier + " frontier size");
+        System.out.println("Nodes Expanded: " + nodesExpanded);
+        System.out.println("Path Cost: " + pathCost);
+        System.out.println("Frontier Size: " +frontier );
         
     }
     

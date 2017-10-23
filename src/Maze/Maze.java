@@ -16,8 +16,9 @@ public class Maze {
     int goalCounter;
     List<Square> goals;
     int maxSpace;
+    int plusSpace;
     
-    Maze(String filename){
+    Maze(String filename, int space){
         List<List <Square>> row = new ArrayList<>();
         goals = new ArrayList<>();
         try (FileInputStream in = new FileInputStream(filename);
@@ -47,6 +48,7 @@ public class Maze {
             rowSize = maze.size();
             colSize = maze.get(0).size();
             goalCounter = 1;
+            plusSpace = space;
         } catch (IOException e){
             System.err.print("File does not exist");
         } catch (Exception e){
@@ -55,7 +57,7 @@ public class Maze {
     }
     
     void display(){
-        maxSpace = String.valueOf(goals.size()).length() + 3;
+        maxSpace = String.valueOf(goals.size()).length() + plusSpace;
         for (List<Square> x: maze){
             for (int i = 0; i < x.size(); i++){
                 String str = x.get(i).val;
