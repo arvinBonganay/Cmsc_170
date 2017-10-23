@@ -3,14 +3,15 @@ import java.io.*;
 import java.util.*;
 
 public class MazeSolver {
-
+    static int frontier = 0;
     public static void main(String[] args) {
         String a = "straightLine";
         String b = "manhattan";
-        String heuristic = a;
-        Maze x = new Maze("others/mediumMaze.lay.txt");
-        solve(x, heuristic);
+        String heuristic = b;
+        Maze x = new Maze("others/smallMaze.lay.txt");
+        System.out.println("The Maze:");
         x.display();
+        solve(x, heuristic);
     }
     
     public static int solveMaze(Maze maze, String hueristics){
@@ -46,35 +47,59 @@ public class MazeSolver {
             }
         }
         if (closedList.contains(maze.goal)){
-            System.out.println("Successfuly found the target square at " + maze.goal.row + "," + maze.goal.col);
-            trace(maze, maze.goal);
+            frontier += closedList.size() + openList.size();
             return closedList.size();
         } else {
             System.out.println("Failed to find the target square at " + maze.goal.row + "," + maze.goal.col);
             return 0;
         }
     }
-    
+   
     public static void solve(Maze m, String heuristic){
         int nodesExpanded = 0;
+        int pathCost = 0;
         m.nextGoal(heuristic);
+        System.out.println("");
+        System.out.println("Path Coordinates");
         while(m.goal != null){
             nodesExpanded += solveMaze(m, heuristic);
+            pathCost += trace(m);
             m.nextGoal(heuristic);
         }
+        System.out.println("");
+        m.display();
+        System.out.println("");
+        System.out.println("Heuristics: " + heuristic);
         System.out.println(nodesExpanded + " nodes expanded");
+        System.out.println(pathCost + " path cost");
+        System.out.println(frontier + " frontier size");
+        
     }
     
-    public static void trace(Maze m, Square goal){
-        Square current = goal.parent;
+    public static int trace(Maze m){
+        Square current = m.goal;
+        int pathCost = m.goal.g;
+        List<Square> goalsPassed = new ArrayList<>();
+        List<Square> path = new ArrayList<>();
         while(current.parent != null){
             if (current.val.equals(".")) {
+                goalsPassed.add(current);
                 m.removeGoal(current);
-                System.out.println("here!!!");
+            } else if (current.val.equals(" ")){
+                current.val = "-";
             }
-            current.val = ".";
+            path.add(current);
             current = current.parent;
         }
+        for (int i = goalsPassed.size() - 1; i >= 0; i--){
+            goalsPassed.get(i).val = m.goalCounter++ + "";
+        }
+        for (int i = path.size() - 1; i >= 0; i--){
+            Square s = path.get(i);
+            System.out.print(s.row + "," + s.col + " ");
+        }
+        System.out.println("");
+        return pathCost;
     }
     
     public static Square minCost(List<Square> l){
@@ -85,6 +110,5 @@ public class MazeSolver {
             }
         }
         return min;
-    }   
-    
+    }
 }

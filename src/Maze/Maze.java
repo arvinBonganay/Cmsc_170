@@ -13,7 +13,9 @@ public class Maze {
     int rowSize;    
     Square start;
     Square goal;
+    int goalCounter;
     List<Square> goals;
+    int maxSpace;
     
     Maze(String filename){
         List<List <Square>> row = new ArrayList<>();
@@ -44,6 +46,7 @@ public class Maze {
             maze = row;
             rowSize = maze.size();
             colSize = maze.get(0).size();
+            goalCounter = 1;
         } catch (IOException e){
             System.err.print("File does not exist");
         } catch (Exception e){
@@ -52,9 +55,15 @@ public class Maze {
     }
     
     void display(){
+        maxSpace = String.valueOf(goals.size()).length() + 3;
         for (List<Square> x: maze){
             for (int i = 0; i < x.size(); i++){
-                System.out.print(x.get(i).val);
+                String str = x.get(i).val;
+                int space = maxSpace - str.length();
+                System.out.print(str);
+                for (int s = 0; s < space; s++){
+                    System.out.print(" ");
+                }
             }
             System.out.println();
         }
@@ -70,17 +79,17 @@ public class Maze {
         int mRow = maze.size();
         int mCol = maze.get(0).size();
         List<Square> l = new ArrayList<>();
-        if (col - 1 >= 0){
-            l.add(maze.get(row).get(col - 1));
-        }
-        if (row + 1 <mRow){
-            l.add(maze.get(row + 1).get(col));
+        if (row - 1 >= 0){
+            l.add(maze.get(row - 1).get(col));
         }
         if (col + 1 < mCol){
             l.add(maze.get(row).get(col + 1));
         }
-        if (row - 1 >= 0){
-            l.add(maze.get(row - 1).get(col));
+        if (row + 1 <mRow){
+            l.add(maze.get(row + 1).get(col));
+        }
+         if (col - 1 >= 0){
+            l.add(maze.get(row).get(col - 1));
         }
         return l;
     }
@@ -121,7 +130,6 @@ public class Maze {
     int hCost(String hueristics,Square sq){
         int x1 = sq.row;
         int y1 = sq.col;
-        
         if (hueristics.equals("manhattan")){
             return manhattanD(x1, y1);
         } else if (hueristics.equals("straightLine")){ 
