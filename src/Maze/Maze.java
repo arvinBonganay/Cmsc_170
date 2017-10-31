@@ -1,5 +1,5 @@
 package Maze;
-
+// herree
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,14 +10,14 @@ import java.util.List;
 public class Maze {
     List<List <Square>> maze;
     int colSize;
-    int rowSize;    
+    int rowSize;
     Square start;
     Square goal;
     int goalCounter;
     List<Square> goals;
     int maxSpace;
     int plusSpace;
-    
+
     Maze(String filename, int space){
         List<List <Square>> row = new ArrayList<>();
         goals = new ArrayList<>();
@@ -55,7 +55,7 @@ public class Maze {
             e.printStackTrace();
         }
     }
-    
+
     void display(){
         maxSpace = String.valueOf(goals.size()).length() + plusSpace;
         for (List<Square> x: maze){
@@ -70,11 +70,11 @@ public class Maze {
             System.out.println();
         }
     }
-    
+
     Square get(int row, int col){
         return maze.get(row).get(col);
     }
-    
+
     List<Square> neighbor(Square sq){
         int row = sq.row;
         int col = sq.col;
@@ -95,7 +95,7 @@ public class Maze {
         }
         return l;
     }
-    
+
     void nextGoal(String heuristic){
         start = goal;
         removeGoal(start);
@@ -116,25 +116,25 @@ public class Maze {
         }
         goal = g;
     }
-    
+
     void removeGoal(Square s){
         goals.remove(s);
     }
-    
+
     int manhattanD(int x1,int y1){
         return Math.abs(x1 - goal.row) + Math.abs(y1 - goal.col);
     }
-    
+
     int straightLineD(int x1, int y1){
         return Math.max(Math.abs(x1 - goal.row), Math.abs(y1 - goal.col));
     }
-    
+
     int hCost(String hueristics,Square sq){
         int x1 = sq.row;
         int y1 = sq.col;
         if (hueristics.equals("manhattan")){
             return manhattanD(x1, y1);
-        } else if (hueristics.equals("straightLine")){ 
+        } else if (hueristics.equals("straightLine")){
             return straightLineD(x1, y1);
         } else {
             System.err.println("Incorrect heuristic");
